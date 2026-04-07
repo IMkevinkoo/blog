@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
-import { Menu, X, Search, Github, Twitter } from 'lucide-react';
+import { Menu, X, Search, Github, Twitter, LogIn, LogOut, PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isAdmin, login, logout } = useAuth();
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -47,12 +49,43 @@ export default function Header() {
           </div>
 
           <div className="hidden sm:flex items-center gap-3 border-l border-gray-200 pl-4 ml-2">
-            <a href="#" className="text-gray-500 hover:text-gray-900 transition-colors">
-              <Github size={20} />
-            </a>
-            <a href="#" className="text-gray-500 hover:text-gray-900 transition-colors">
-              <Twitter size={20} />
-            </a>
+            {user ? (
+              <div className="flex items-center gap-4">
+                {isAdmin && (
+                  <Link 
+                    to="/create" 
+                    className="flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+                  >
+                    <PlusCircle size={18} />
+                    <span>New Post</span>
+                  </Link>
+                )}
+                <div className="flex items-center gap-2">
+                  {user.photoURL ? (
+                    <img src={user.photoURL} alt={user.displayName || ''} className="h-8 w-8 rounded-full" />
+                  ) : (
+                    <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                      {user.displayName?.charAt(0) || user.email?.charAt(0)}
+                    </div>
+                  )}
+                  <button 
+                    onClick={logout}
+                    className="text-gray-500 hover:text-red-600 transition-colors"
+                    title="Logout"
+                  >
+                    <LogOut size={20} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button 
+                onClick={login}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100"
+              >
+                <LogIn size={18} />
+                Login
+              </button>
+            )}
           </div>
 
           <button

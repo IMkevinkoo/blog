@@ -8,18 +8,23 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import PostDetail from './pages/PostDetail';
 import About from './pages/About';
+import CreatePost from './pages/CreatePost';
+import { AuthProvider } from './contexts/AuthContext';
 
 export default function App() {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/post/:id" element={<PostDetail />} />
-          <Route path="/about" element={<About />} />
-        </Routes>
-      </Layout>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/post/:id" element={<PostDetail />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/create" element={<CreatePost />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </AuthProvider>
   );
 }
 

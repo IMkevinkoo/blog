@@ -35,6 +35,7 @@ React 19 introduces several new hooks like \`useActionState\`, \`useFormStatus\`
 Stay tuned for more in-depth tutorials on each of these features!
     `,
     author: 'Jane Doe',
+    authorId: 'mock-1',
     date: '2024-03-15',
     category: 'React',
     image: 'https://picsum.photos/seed/react/800/400',
@@ -64,6 +65,7 @@ Tailwind 4.0 adds several new utility classes and improves existing ones, giving
 Try it out today and see the difference!
     `,
     author: 'John Smith',
+    authorId: 'mock-2',
     date: '2024-03-10',
     category: 'CSS',
     image: 'https://picsum.photos/seed/tailwind/800/400',
@@ -93,6 +95,7 @@ Serverless continues to gain popularity, enabling developers to focus on writing
 What are your thoughts on the future of the web? Let us know in the comments!
     `,
     author: 'Alice Johnson',
+    authorId: 'mock-3',
     date: '2024-03-05',
     category: 'Trends',
     image: 'https://picsum.photos/seed/future/800/400',

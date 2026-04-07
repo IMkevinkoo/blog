@@ -1,13 +1,64 @@
-import { useParams, Link } from 'react-router-dom';
-import { posts } from '../data/posts';
-import { Calendar, Clock, User, ChevronLeft, Share2, Bookmark } from 'lucide-react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { db, handleFirestoreError, OperationType } from '../firebase';
+import { useAuth } from '../contexts/AuthContext';
+import { Post } from '../types';
+import { Calendar, Clock, ChevronLeft, Share2, Bookmark, Trash2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { format } from 'date-fns';
 import { motion } from 'motion/react';
 
 export default function PostDetail() {
   const { id } = useParams<{ id: string }>();
-  const post = posts.find((p) => p.id === id);
+  const navigate = useNavigate();
+  const { user, isAdmin } = useAuth();
+  const [post, setPost] = useState<Post | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchPost = async () => {
+      try {
+        const docRef = doc(db, 'posts', id);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          setPost({ id: docSnap.id, ...docSnap.data() } as Post);
+        }
+      } catch (error) {
+        handleFirestoreError(error, OperationType.GET, `posts/${id}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [id]);
+
+  const handleDelete = async () => {
+    if (!id || !window.confirm('Are you sure you want to delete this post?')) return;
+    
+    setDeleting(true);
+    try {
+      await deleteDoc(doc(db, 'posts', id));
+      navigate('/');
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, `posts/${id}`);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
 
   if (!post) {
     return (
@@ -62,6 +113,16 @@ export default function PostDetail() {
           </div>
 
           <div className="flex items-center gap-3">
+            {(isAdmin || (user && user.uid === post.authorId)) && (
+              <button 
+                onClick={handleDelete}
+                disabled={deleting}
+                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
+                title="Delete Post"
+              >
+                <Trash2 size={20} />
+              </button>
+            )}
             <button className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
               <Share2 size={20} />
             </button>
